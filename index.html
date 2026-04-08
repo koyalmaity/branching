@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Supply Chain Dashboard</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Login Page -->
+    <section id="login-page" class="view-section active">
+        <div class="login-container">
+            <div class="login-card">
+                <h2>Supply Chain AI</h2>
+                <p class="subtitle">Enter your credentials to access the dashboard</p>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" required placeholder="admin@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" required placeholder="••••••••">
+                    </div>
+                    <div class="error-msg" id="login-error"></div>
+                    <button type="submit" class="btn-primary w-100">Sign In</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- App Layout (Hidden by default until logged in) -->
+    <div id="app-layout" class="hidden">
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="logo.png" alt="SupplyAI Logo" class="sidebar-logo">
+                <h2>SupplyAI</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-target="dashboard-page">
+                    <span class="material-icons">dashboard</span> Dashboard
+                </a>
+                <a href="#" class="nav-item" data-target="inventory-page">
+                    <span class="material-icons">inventory_2</span> Inventory
+                </a>
+                <a href="#" class="nav-item" data-target="orders-page">
+                    <span class="material-icons">local_shipping</span> Orders
+                </a>
+                <a href="#" class="nav-item" data-target="analytics-page">
+                    <span class="material-icons">analytics</span> Analytics
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="#" class="nav-item" id="logout-btn">
+                    <span class="material-icons">logout</span> Logout
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <!-- Top Navbar -->
+            <header class="top-nav">
+                <button id="menu-btn" class="menu-btn"><span class="material-icons">menu</span></button>
+                <div class="nav-title">Dashboard Overview</div>
+                <div class="nav-actions">
+                    <div class="user-profile">
+                        <img src="https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff"
+                            alt="User Avatar" class="avatar">
+                        <span>Admin</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Page -->
+            <section id="dashboard-page" class="view-section">
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-icon blue"><span class="material-icons">shopping_cart</span></div>
+                        <div class="kpi-info">
+                            <h3>Total Orders</h3>
+                            <p id="kpi-total-orders">Loading...</p>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon green"><span class="material-icons">attach_money</span></div>
+                        <div class="kpi-info">
+                            <h3>Revenue</h3>
+                            <p id="kpi-revenue">Loading...</p>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon red"><span class="material-icons">warning</span></div>
+                        <div class="kpi-info">
+                            <h3>Low Stock Alerts</h3>
+                            <p id="kpi-low-stock">Loading...</p>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon orange"><span class="material-icons">schedule</span></div>
+                        <div class="kpi-info">
+                            <h3>Delayed Deliveries</h3>
+                            <p id="kpi-delayed">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-widgets">
+                    <div class="card widget-chart">
+                        <h3>Weekly Order Trends</h3>
+                        <div class="canvas-container" style="height: 300px;">
+                            <canvas id="overviewChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card widget-notifications">
+                        <h3>Real-time Notifications</h3>
+                        <ul id="notification-list" class="notification-list">
+                            <!-- Populated via JS -->
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Inventory Page -->
+            <section id="inventory-page" class="view-section hidden">
+                <div class="page-header">
+                    <h2>Inventory Management</h2>
+                    <button class="btn-primary" id="add-product-btn"><span class="material-icons">add</span> Add
+                        Product</button>
+                </div>
+
+                <div class="card add-product-card hidden" id="add-product-container" style="margin-bottom: 20px;">
+                    <h3>Add New Product</h3>
+                    <form id="add-product-form" style="margin-top: 15px;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Product Name</label>
+                                <input type="text" id="new-product-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Quantity</label>
+                                <input type="number" id="new-product-qty" required min="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Location</label>
+                                <select id="new-product-loc">
+                                    <option value="Warehouse A">Warehouse A</option>
+                                    <option value="Warehouse B">Warehouse B</option>
+                                    <option value="Warehouse C">Warehouse C</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-actions" style="margin-top: 10px;">
+                            <button type="submit" class="btn-primary">Save Product</button>
+                            <button type="button" class="btn-secondary" id="cancel-add-btn">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card table-card">
+                    <div class="table-responsive">
+                        <table id="inventory-table">
+                            <thead>
+                                <tr>
+                                    <th>Product Name</th>
+                                    <th>Quantity</th>
+                                    <th>Warehouse Location</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Populated via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Orders Page -->
+            <section id="orders-page" class="view-section hidden">
+                <div class="page-header">
+                    <h2>Orders & Deliveries</h2>
+                </div>
+
+                <div class="card table-card">
+                    <div class="table-responsive">
+                        <table id="orders-table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Product Name</th>
+                                    <th>Status</th>
+                                    <th>Timeline Progression</th>
+                                    <th>Update Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Populated via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analytics Page -->
+            <section id="analytics-page" class="view-section hidden">
+                <div class="page-header">
+                    <h2>Analytics & Forecasting</h2>
+                </div>
+
+                <div class="card ai-insights">
+                    <div class="insight-icon"><span class="material-icons">auto_awesome</span></div>
+                    <div class="insight-content">
+                        <h3>AI Supply Chain Insights</h3>
+                        <p><strong>Anomaly Detected:</strong> Expect a 15% delay in shipments from Warehouse B due to
+                            severe weather conditions over the next 48 hours. Consider rerouting critical orders to
+                            Warehouse A.</p>
+                        <p><strong>Demand Forecast:</strong> Product 'Quantum Processors' is predicted to see a 25%
+                            surge in demand next month. Recommended to increase procurement by 500 units.</p>
+                    </div>
+                </div>
+
+                <div class="charts-grid mt-4">
+                    <div class="card widget-chart">
+                        <h3>Demand Forecasting (Next 6 Months)</h3>
+                        <div class="canvas-container" style="height: 300px;">
+                            <canvas id="forecastChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card widget-chart">
+                        <h3>Product Performance (Sales by Category)</h3>
+                        <div class="canvas-container" style="height: 300px;">
+                            <canvas id="performanceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
